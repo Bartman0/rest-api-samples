@@ -61,7 +61,8 @@ import javax.xml.bind.annotation.XmlType;
     "fileUpload",
     "group",
     "permissions",
-    "workbook"
+    "workbook",
+    "views"
 })
 @XmlRootElement(name = "tsResponse")
 public class TsResponse {
@@ -77,6 +78,7 @@ public class TsResponse {
     protected GroupType group;
     protected PermissionsType permissions;
     protected WorkbookType workbook;
+    protected ViewListType views;
 
     /**
      * Gets the value of the pagination property.
@@ -172,6 +174,14 @@ public class TsResponse {
      */
     public void setSites(SiteListType value) {
         this.sites = value;
+    }
+
+    public ViewListType getViews() {
+        return views;
+    }
+
+    public void setViews(ViewListType value) {
+        this.views = value;
     }
 
     /**

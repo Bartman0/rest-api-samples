@@ -1,16 +1,21 @@
 package com.tableausoftware.documentation.api.rest.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import com.google.common.io.Files;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.MultiPart;
+import com.sun.jersey.multipart.MultiPartMediaTypes;
+import com.sun.jersey.multipart.file.FileDataBodyPart;
+import com.tableausoftware.documentation.api.rest.bindings.*;
+import org.apache.log4j.Logger;
+import org.xml.sax.SAXException;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.XMLConstants;
@@ -21,34 +26,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
-
-import com.google.common.io.Files;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.MultiPartMediaTypes;
-import com.sun.jersey.multipart.file.FileDataBodyPart;
-import com.tableausoftware.documentation.api.rest.bindings.CapabilityType;
-import com.tableausoftware.documentation.api.rest.bindings.FileUploadType;
-import com.tableausoftware.documentation.api.rest.bindings.GranteeCapabilitiesType;
-import com.tableausoftware.documentation.api.rest.bindings.GroupType;
-import com.tableausoftware.documentation.api.rest.bindings.ObjectFactory;
-import com.tableausoftware.documentation.api.rest.bindings.PermissionsType;
-import com.tableausoftware.documentation.api.rest.bindings.ProjectListType;
-import com.tableausoftware.documentation.api.rest.bindings.ProjectType;
-import com.tableausoftware.documentation.api.rest.bindings.SiteListType;
-import com.tableausoftware.documentation.api.rest.bindings.SiteType;
-import com.tableausoftware.documentation.api.rest.bindings.TableauCredentialsType;
-import com.tableausoftware.documentation.api.rest.bindings.TsRequest;
-import com.tableausoftware.documentation.api.rest.bindings.TsResponse;
-import com.tableausoftware.documentation.api.rest.bindings.WorkbookListType;
-import com.tableausoftware.documentation.api.rest.bindings.WorkbookType;
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * This class encapsulates the logic used to make requests to the Tableau Server
@@ -61,10 +43,14 @@ public class RestApiUtils {
         APPEND_FILE_UPLOAD(getApiUriBuilder().path("sites/{siteId}/fileUploads/{uploadSessionId}")),
         CREATE_GROUP(getApiUriBuilder().path("sites/{siteId}/groups")),
         INITIATE_FILE_UPLOAD(getApiUriBuilder().path("sites/{siteId}/fileUploads")),
+        QUERY_VIEW_IMAGE(getApiUriBuilder().path("sites/{siteId}/view/{viewId}/image/{filters}")),
+        QUERY_VIEW_PDF(getApiUriBuilder().path("sites/{siteId}/view/{viewId}/pdf/{filters}")),
         PUBLISH_WORKBOOK(getApiUriBuilder().path("sites/{siteId}/workbooks")),
         QUERY_PROJECTS(getApiUriBuilder().path("sites/{siteId}/projects")),
         QUERY_SITES(getApiUriBuilder().path("sites")),
-        QUERY_WORKBOOKS(getApiUriBuilder().path("sites/{siteId}/users/{userId}/workbooks")),
+        QUERY_WORKBOOKS_FOR_USER(getApiUriBuilder().path("sites/{siteId}/users/{userId}/workbooks")),
+        QUERY_WORKBOOKS(getApiUriBuilder().path("sites/{siteId}/workbooks")),
+        QUERY_VIEWS_FOR_WORKBOOK(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId}/views")),
         SIGN_IN(getApiUriBuilder().path("auth/signin")),
         SIGN_OUT(getApiUriBuilder().path("auth/signout"));
 
@@ -303,7 +289,7 @@ public class RestApiUtils {
         String url = Operation.QUERY_PROJECTS.getUrl(siteId);
 
         // Makes a GET request with the authenticity token
-        TsResponse response = get(url, credential.getToken());
+        TsResponse response = get(url, credential.getToken(), null, null);
 
         // Verifies that the response has a projects element
         if (response.getProjects() != null) {
@@ -331,7 +317,7 @@ public class RestApiUtils {
         String url = Operation.QUERY_SITES.getUrl();
 
         // Makes a GET request with the authenticity token
-        TsResponse response = get(url, credential.getToken());
+        TsResponse response = get(url, credential.getToken(), null, null);
 
         // Verifies that the response has a sites element
         if (response.getSites() != null) {
@@ -357,14 +343,15 @@ public class RestApiUtils {
      *            the ID of the target user
      * @return a list of workbooks if the query succeeded, otherwise <code>null</code>
      */
-    public WorkbookListType invokeQueryWorkbooks(TableauCredentialsType credential, String siteId, String userId) {
+    public WorkbookListType invokeQueryWorkbooksForUser(TableauCredentialsType credential, String siteId, String userId,
+                        FilterCollection filters, HashMap<String, String> params) {
 
-        m_logger.info(String.format("Querying workbooks on site '%s'.", siteId));
+        m_logger.info(String.format("Querying workbooks on site '%s' for user '%s'.", siteId, userId));
 
-        String url = Operation.QUERY_WORKBOOKS.getUrl(siteId, userId);
+        String url = Operation.QUERY_WORKBOOKS_FOR_USER.getUrl(siteId, userId);
 
         // Makes a GET request with the authenticity token
-        TsResponse response = get(url, credential.getToken());
+        TsResponse response = get(url, credential.getToken(),filters, params);
 
         // Verifies that the response has a workbooks element
         if (response.getWorkbooks() != null) {
@@ -374,6 +361,48 @@ public class RestApiUtils {
         }
 
         // No workbooks were found
+        return null;
+    }
+
+    public WorkbookListType invokeQueryWorkbooksForSite(TableauCredentialsType credential, String siteId,
+                        FilterCollection filters, HashMap<String, String> params) {
+
+        m_logger.info(String.format("Querying workbooks on site '%s'.", siteId));
+
+        String url = Operation.QUERY_WORKBOOKS.getUrl(siteId);
+
+        // Makes a GET request with the authenticity token
+        TsResponse response = get(url, credential.getToken(), filters, params);
+
+        // Verifies that the response has a workbooks element
+        if (response.getWorkbooks() != null) {
+            m_logger.info("Query workbooks is successful!");
+
+            return response.getWorkbooks();
+        }
+
+        // No workbooks were found
+        return null;
+    }
+
+    public ViewListType invokeQueryViewsForWorkbook(TableauCredentialsType credential, String siteId, String workbookId,
+                    FilterCollection filters, HashMap<String, String> params) {
+
+        m_logger.info(String.format("Querying views for workbook on site '%s'.", siteId));
+
+        String url = Operation.QUERY_VIEWS_FOR_WORKBOOK.getUrl(siteId, workbookId);
+
+        // Makes a GET request with the authenticity token
+        TsResponse response = get(url, credential.getToken(), filters, params);
+
+        // Verifies that the response has a workbooks element
+        if (response.getViews() != null) {
+            m_logger.info("Query views for workbook is successful!");
+
+            return response.getViews();
+        }
+
+        // No views were found
         return null;
     }
 
@@ -567,14 +596,23 @@ public class RestApiUtils {
      *            the authentication token to use for this request
      * @return the response from the request
      */
-    private TsResponse get(String url, String authToken) {
+    private TsResponse get(String url, String authToken, FilterCollection filters, HashMap<String, String> params) {
         // Creates the HTTP client object and makes the HTTP request to the
         // specified URL
         Client client = Client.create();
         WebResource webResource = client.resource(url);
 
+        MultivaluedMap<String,String> l = new MultivaluedMapImpl();
+        if (filters != null) {
+            l.add("filter", filters.collectEncodedValue());
+        }
+        if (params != null) {
+            for (Map.Entry<String, String> p : params.entrySet()) {
+                l.add(p.getKey(), p.getValue());
+            }
+        }
         // Sets the header and makes a GET request
-        ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, authToken).get(ClientResponse.class);
+        ClientResponse clientResponse = webResource.queryParams(l).header(TABLEAU_AUTH_HEADER, authToken).get(ClientResponse.class);
 
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
@@ -583,6 +621,36 @@ public class RestApiUtils {
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
+    }
+
+    /**
+     * Creates a GET request using the specified URL.
+     *
+     * @param url
+     *            the URL to send the request to
+     * @param authToken
+     *            the authentication token to use for this request
+     * @return the response from the request
+     */
+    private byte[] get_data(String url, String authToken, HashMap<String, String> params) {
+        // Creates the HTTP client object and makes the HTTP request to the
+        // specified URL
+        Client client = Client.create();
+        WebResource webResource = client.resource(url);
+
+        MultivaluedMap<String,String> l = new MultivaluedMapImpl();
+        if (params != null) {
+            for (Map.Entry<String, String> p : params.entrySet()) {
+                l.add(p.getKey(), p.getValue());
+            }
+        }
+        // Sets the header and makes a GET request
+        ClientResponse clientResponse = webResource.queryParams(l).header(TABLEAU_AUTH_HEADER, authToken).get(ClientResponse.class);
+        byte[] data = clientResponse.getEntity(byte[].class);
+
+        m_logger.info("Response received with data, size [" + data.length + "]");
+
+        return data;
     }
 
     /**
@@ -753,6 +821,36 @@ public class RestApiUtils {
 
         // No workbook was published
         return null;
+    }
+
+    /**
+     * Invokes an HTTP request to download a PDF of a view from target site 
+     * with the configured settings in the request.
+     *
+     * @param credential
+     *            the credential containing the authentication token to use for
+     *            this request
+     * @param siteId
+     *            the ID of the target site
+     * @param params
+     *            the view filters to apply
+     * @return the PDF if it was published successfully, otherwise
+     *         <code>null</code>
+     */
+    public byte[] invokeQueryViewPDF(TableauCredentialsType credential, String siteId,
+            String viewId, HashMap<String, String> params) {
+
+        String url = Operation.QUERY_VIEW_PDF.getUrl(siteId, viewId);
+
+        return get_data(url, credential.getToken(), params);
+    }
+
+    public byte[] invokeQueryViewImage(TableauCredentialsType credential, String siteId,
+                                     String viewId, HashMap<String, String> params) {
+
+        String url = Operation.QUERY_VIEW_IMAGE.getUrl(siteId, viewId);
+
+        return get_data(url, credential.getToken(), params);
     }
 
     /**

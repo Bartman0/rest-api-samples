@@ -132,8 +132,8 @@ public class Demo {
                 granteeCapabilities);
 
         // Gets the list of workbooks the current user can read
-        List<WorkbookType> currentUserWorkbooks = s_restApiUtils.invokeQueryWorkbooks(credential, currentSiteId,
-                currentUserId).getWorkbook();
+        List<WorkbookType> currentUserWorkbooks = s_restApiUtils.invokeQueryWorkbooksForUser(credential, currentSiteId,
+                currentUserId, null, null).getWorkbook();
 
         // Checks whether the workbook published previously is in the list, then
         // checks whether the workbook's owner is the current user
