@@ -29,7 +29,7 @@
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+        <javac target="1.8" source="1.8" srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false"/>
     </target>
 
     <target name="jar" depends="compile">
@@ -38,6 +38,7 @@
             <manifest>
                 <attribute name="Main-Class" value="${main-class}"/>
             </manifest>
+            <fileset dir="${src.dir}" includes="**/*.java"/>
         </jar>
     </target>
 

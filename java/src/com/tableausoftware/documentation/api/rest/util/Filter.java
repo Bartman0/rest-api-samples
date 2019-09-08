@@ -16,12 +16,14 @@ public class Filter {
         this.value = value;
     }
 
-    public static enum Operation {
+    public enum Operation {
         EQ("eq"),
         GT("gt"),
         GTE("gte"),
         LT("lt"),
-        LTE("lte");
+        LTE("lte"),
+        IN("in"),
+        HAS("has");
 
         private String value;
 

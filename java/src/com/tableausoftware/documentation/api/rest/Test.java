@@ -1,44 +1,18 @@
 package com.tableausoftware.documentation.api.rest;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import com.tableausoftware.documentation.api.rest.bindings.*;
+import com.tableausoftware.documentation.api.rest.util.RestApiUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
-import com.tableausoftware.documentation.api.rest.bindings.GranteeCapabilitiesType;
-import com.tableausoftware.documentation.api.rest.bindings.GroupType;
-import com.tableausoftware.documentation.api.rest.bindings.ProjectListType;
-import com.tableausoftware.documentation.api.rest.bindings.ProjectType;
-import com.tableausoftware.documentation.api.rest.bindings.TableauCredentialsType;
-import com.tableausoftware.documentation.api.rest.bindings.WorkbookType;
-import com.tableausoftware.documentation.api.rest.util.RestApiUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
 
-/**
- * This class demonstrates how to make Tableau REST API calls. It first gets
- * some required values from the configuration file, including the credentials
- * for a system administrator to authenticate as, and the name or IP address of the
- * server to sign in to. The code then makes REST API calls to perform these
- * tasks:
- *
- * 1. Sign in to the server ("Sign In" method).
- * 2. Get a list of projects ("Query Projects" method).
- * 3. Get the ID of the current project, which is the default project.
- * 4. Publish a workbook ("Publish Workbook").
- * 5. Create a group on the server ("Create Group" method).
- * 6. Set permissions for the group on the published workbook ("Add Workbook Permissions" method).
- * 7. Get a list of workbooks that the current user can read ("Query Workbooks For User" method).
- * 8. Sign out ("Sign Out" method).
- */
-public class Demo {
+public class Test {
 
-    private static Logger s_logger = Logger.getLogger(Demo.class);
+    private static Logger s_logger = Logger.getLogger(Test.class);
 
     private static Properties s_properties = new Properties();
 

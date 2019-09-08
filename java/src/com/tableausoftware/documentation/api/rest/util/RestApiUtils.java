@@ -30,13 +30,18 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * This class encapsulates the logic used to make requests to the Tableau Server
  * REST API. This class is implemented as a singleton.
  */
 public class RestApiUtils {
+
+    public static final String API_VERSION = "3.3";
+    public static final String API_SCHEMA = "resources/ts-api_3_3.xsd";
+    private static String server;
+    private static int port;
+    private static String project;
 
     private enum Operation {
         ADD_WORKBOOK_PERMISSIONS(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId}/permissions")),
@@ -74,15 +79,14 @@ public class RestApiUtils {
     private static Marshaller s_jaxbMarshaller;
     private static Unmarshaller s_jaxbUnmarshaller;
 
-    private static Properties m_properties = new Properties();
     /**
      * Initializes the RestApiUtils if it has not already been done so.
      *
      * @return the single instance of the RestApiUtils
      */
-    public static RestApiUtils getInstance() {
+    public static RestApiUtils getInstance(String server, int port, String project) {
         if (INSTANCE == null) {
-            INSTANCE = new RestApiUtils();
+            INSTANCE = new RestApiUtils(server, port, project);
             initialize();
         }
 
@@ -96,7 +100,7 @@ public class RestApiUtils {
      * @return the URI builder
      */
     private static UriBuilder getApiUriBuilder() {
-        return UriBuilder.fromPath(m_properties.getProperty("server.host") + "/api/3.4");
+        return UriBuilder.fromPath(server + "/api/" + API_VERSION + "/");
     }
     /**
      * Initializes the RestApiUtils. The initialize code loads values from the configuration
@@ -104,16 +108,15 @@ public class RestApiUtils {
      */
     private static void initialize() {
         try {
-            m_properties.load(new FileInputStream("res/config.properties"));
             JAXBContext jaxbContext = JAXBContext.newInstance(TsRequest.class, TsResponse.class);
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFactory.newSchema(new File(m_properties.getProperty("server.schema.location")));
+            Schema schema = schemaFactory.newSchema(new File(API_SCHEMA));
             s_jaxbMarshaller = jaxbContext.createMarshaller();
             s_jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             s_jaxbUnmarshaller.setSchema(schema);
             s_jaxbMarshaller.setSchema(schema);
-        } catch (JAXBException | SAXException | IOException ex) {
-            throw new IllegalStateException("Failed to initialize the REST API");
+        } catch (JAXBException | SAXException ex) {
+            throw new IllegalStateException("Failed to initialize the REST API", ex);
         }
     }
 
@@ -126,7 +129,11 @@ public class RestApiUtils {
     private ObjectFactory m_objectFactory = new ObjectFactory();
 
     // This class is implemented as a singleton, so it cannot be constructed externally
-    private RestApiUtils() {}
+    private RestApiUtils(String server, int port, String project) {
+        RestApiUtils.server = server;
+        RestApiUtils.port = port;
+        RestApiUtils.project = project;
+    }
 
     /**
      * Creates a grantee capability object used to modify permissions on Tableau
@@ -214,8 +221,6 @@ public class RestApiUtils {
      *            the ID of the target site
      * @param groupName
      *            the name to assign to the new group
-     * @param requestPayload
-     *            the payload used to create the group
      * @return the group if it was successfully created, otherwise
      *         <code>null</code>
      */
@@ -251,9 +256,6 @@ public class RestApiUtils {
      *            this request
      * @param siteId
      *            the ID of the target site
-     * @param requestPayload
-     *            the XML payload containing the workbook attributes used to
-     *            publish the workbook
      * @param workbookFile
      *            the workbook file to publish
      * @param chunkedPublish
@@ -409,8 +411,6 @@ public class RestApiUtils {
     /**
      * Invokes an HTTP request to sign in to the server.
      *
-     * @param requestPayload
-     *            the payload containing the username and password to authenticate
      * @return the credential if authentication was successful, otherwise
      *         <code>null</code>
      */
@@ -608,7 +608,7 @@ public class RestApiUtils {
         }
         if (params != null) {
             for (Map.Entry<String, String> p : params.entrySet()) {
-                l.add(p.getKey(), p.getValue());
+                l.add("vf_" + p.getKey(), p.getValue());
             }
         }
         // Sets the header and makes a GET request
@@ -641,7 +641,7 @@ public class RestApiUtils {
         MultivaluedMap<String,String> l = new MultivaluedMapImpl();
         if (params != null) {
             for (Map.Entry<String, String> p : params.entrySet()) {
-                l.add(p.getKey(), p.getValue());
+                l.add("vf_" + p.getKey(), p.getValue());
             }
         }
         // Sets the header and makes a GET request
@@ -730,9 +730,6 @@ public class RestApiUtils {
      *            this request
      * @param siteId
      *            the ID of the target site
-     * @param requestPayload
-     *            the XML payload containing the workbook attributes used to
-     *            publish the workbook
      * @param workbookFile
      *            the workbook file to publish
      * @return the workbook if it was published successfully, otherwise
@@ -790,9 +787,6 @@ public class RestApiUtils {
      *            this request
      * @param siteId
      *            the ID of the target site
-     * @param requestPayload
-     *            the XML payload containing the workbook attributes used to
-     *            publish the workbook
      * @param workbookFile
      *            the workbook file to publish
      * @return the workbook if it was published successfully, otherwise
@@ -937,8 +931,8 @@ public class RestApiUtils {
      *            the authentication token to use for this request
      * @param requestPayload
      *            the payload to send with the request
-     * @param file
-     *            the file to send with the request
+     * @param filePart
+     *            the part of a file to send with the request
      * @return the response from the request
      */
     private TsResponse postMultipart(String url, String authToken, TsRequest requestPayload, BodyPart filePart) {
@@ -1047,8 +1041,8 @@ public class RestApiUtils {
      *            the authentication token to use for this request
      * @param requestPayload
      *            the payload to send with the request
-     * @param file
-     *            the file to send with the request
+     * @param filePart
+     *            the part of a file to send with the request
      * @return the response from the request
      */
     private TsResponse putMultipart(String url, String authToken, TsRequest requestPayload, BodyPart filePart) {
