@@ -48,8 +48,8 @@ public class RestApiUtils {
         APPEND_FILE_UPLOAD(getApiUriBuilder().path("sites/{siteId}/fileUploads/{uploadSessionId}")),
         CREATE_GROUP(getApiUriBuilder().path("sites/{siteId}/groups")),
         INITIATE_FILE_UPLOAD(getApiUriBuilder().path("sites/{siteId}/fileUploads")),
-        QUERY_VIEW_IMAGE(getApiUriBuilder().path("sites/{siteId}/view/{viewId}/image/{filters}")),
-        QUERY_VIEW_PDF(getApiUriBuilder().path("sites/{siteId}/view/{viewId}/pdf/{filters}")),
+        QUERY_VIEW_IMAGE(getApiUriBuilder().path("sites/{siteId}/views/{viewId}/image")),
+        QUERY_VIEW_PDF(getApiUriBuilder().path("sites/{siteId}/views/{viewId}/pdf")),
         PUBLISH_WORKBOOK(getApiUriBuilder().path("sites/{siteId}/workbooks")),
         QUERY_PROJECTS(getApiUriBuilder().path("sites/{siteId}/projects")),
         QUERY_SITES(getApiUriBuilder().path("sites")),
@@ -291,7 +291,7 @@ public class RestApiUtils {
         String url = Operation.QUERY_PROJECTS.getUrl(siteId);
 
         // Makes a GET request with the authenticity token
-        TsResponse response = get(url, credential.getToken(), null, null);
+        TsResponse response = get(url, credential.getToken());
 
         // Verifies that the response has a projects element
         if (response.getProjects() != null) {
@@ -319,7 +319,7 @@ public class RestApiUtils {
         String url = Operation.QUERY_SITES.getUrl();
 
         // Makes a GET request with the authenticity token
-        TsResponse response = get(url, credential.getToken(), null, null);
+        TsResponse response = get(url, credential.getToken());
 
         // Verifies that the response has a sites element
         if (response.getSites() != null) {
@@ -604,6 +604,7 @@ public class RestApiUtils {
 
         MultivaluedMap<String,String> l = new MultivaluedMapImpl();
         if (filters != null) {
+            String tmp = filters.collectEncodedValue();
             l.add("filter", filters.collectEncodedValue());
         }
         if (params != null) {
@@ -612,6 +613,7 @@ public class RestApiUtils {
             }
         }
         // Sets the header and makes a GET request
+        WebResource webResource1 = webResource.queryParams(l);
         ClientResponse clientResponse = webResource.queryParams(l).header(TABLEAU_AUTH_HEADER, authToken).get(ClientResponse.class);
 
         // Parses the response from the server into an XML string
@@ -623,6 +625,10 @@ public class RestApiUtils {
         return unmarshalResponse(responseXML);
     }
 
+    private TsResponse get(String url, String authToken) {
+        return get(url, authToken, null, null);
+    }
+
     /**
      * Creates a GET request using the specified URL.
      *
@@ -632,13 +638,19 @@ public class RestApiUtils {
      *            the authentication token to use for this request
      * @return the response from the request
      */
-    private byte[] get_data(String url, String authToken, HashMap<String, String> params) {
+    private byte[] get_data(String url, String authToken, HashMap<String, String> params, String pagetype, String orientation) {
         // Creates the HTTP client object and makes the HTTP request to the
         // specified URL
         Client client = Client.create();
         WebResource webResource = client.resource(url);
 
         MultivaluedMap<String,String> l = new MultivaluedMapImpl();
+        if (pagetype != null){
+            l.add("type", pagetype);
+        }
+        if (orientation != null){
+            l.add("orientation", orientation);
+        }
         if (params != null) {
             for (Map.Entry<String, String> p : params.entrySet()) {
                 l.add("vf_" + p.getKey(), p.getValue());
@@ -651,6 +663,10 @@ public class RestApiUtils {
         m_logger.info("Response received with data, size [" + data.length + "]");
 
         return data;
+    }
+
+    private byte[] get_data(String url, String authToken, HashMap<String, String> params) {
+        return get_data(url, authToken, params, null, null);
     }
 
     /**
@@ -668,7 +684,7 @@ public class RestApiUtils {
      * @param numChunkBytes
      *            the number of bytes in the chunk of data
      */
-    private void invokeAppendFileUpload(TableauCredentialsType credential, String siteId, String uploadSessionId,
+private void invokeAppendFileUpload(TableauCredentialsType credential, String siteId, String uploadSessionId,
             byte[] chunk, int numChunkBytes) {
 
         m_logger.info(String.format("Appending to file upload '%s'.", uploadSessionId));
@@ -832,11 +848,11 @@ public class RestApiUtils {
      *         <code>null</code>
      */
     public byte[] invokeQueryViewPDF(TableauCredentialsType credential, String siteId,
-            String viewId, HashMap<String, String> params) {
+            String viewId, HashMap<String, String> params, String pagetype, String orientation) {
 
         String url = Operation.QUERY_VIEW_PDF.getUrl(siteId, viewId);
 
-        return get_data(url, credential.getToken(), params);
+        return get_data(url, credential.getToken(), params, pagetype, orientation);
     }
 
     public byte[] invokeQueryViewImage(TableauCredentialsType credential, String siteId,

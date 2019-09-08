@@ -61,13 +61,6 @@ public class Filter {
     }
 
     public String encodedValue() {
-        String result;
-        try {
-            result = String.format("%s:%s:%s", URLEncoder.encode(name, StandardCharsets.UTF_8.toString()),
-                    oper.getOperation(), URLEncoder.encode(value, StandardCharsets.UTF_8.toString()));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        return result;
+        return String.format("%s:%s:%s", name, oper.getOperation(), value);
     }
 }
