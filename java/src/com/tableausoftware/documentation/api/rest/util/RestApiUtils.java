@@ -369,7 +369,7 @@ public class RestApiUtils {
     public WorkbookListType invokeQueryWorkbooksForSite(TableauCredentialsType credential, String siteId,
                         FilterCollection filters, HashMap<String, String> params) {
 
-        m_logger.info(String.format("Querying workbooks on site '%s'.", siteId));
+        m_logger.debug(String.format("Querying workbooks on site '%s'.", siteId));
 
         String url = Operation.QUERY_WORKBOOKS.getUrl(siteId);
 
@@ -378,7 +378,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a workbooks element
         if (response.getWorkbooks() != null) {
-            m_logger.info("Query workbooks is successful!");
+            m_logger.debug("Query workbooks is successful!");
 
             return response.getWorkbooks();
         }
@@ -390,7 +390,7 @@ public class RestApiUtils {
     public ViewListType invokeQueryViewsForWorkbook(TableauCredentialsType credential, String siteId, String workbookId,
                     FilterCollection filters, HashMap<String, String> params) {
 
-        m_logger.info(String.format("Querying views for workbook on site '%s'.", siteId));
+        m_logger.debug(String.format("Querying views for workbook on site '%s'.", siteId));
 
         String url = Operation.QUERY_VIEWS_FOR_WORKBOOK.getUrl(siteId, workbookId);
 
@@ -399,7 +399,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a workbooks element
         if (response.getViews() != null) {
-            m_logger.info("Query views for workbook is successful!");
+            m_logger.debug("Query views for workbook is successful!");
 
             return response.getViews();
         }
@@ -416,7 +416,7 @@ public class RestApiUtils {
      */
     public TableauCredentialsType invokeSignIn(String username, String password, String contentUrl) {
 
-        m_logger.info("Signing in to Tableau Server");
+        m_logger.debug("Signing in to Tableau Server");
 
         String url = Operation.SIGN_IN.getUrl();
 
@@ -428,7 +428,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a credentials element
         if (response.getCredentials() != null) {
-            m_logger.info("Sign in is successful!");
+            m_logger.debug("Sign in is successful!");
 
             return response.getCredentials();
         }
@@ -446,7 +446,7 @@ public class RestApiUtils {
      */
     public void invokeSignOut(TableauCredentialsType credential) {
 
-        m_logger.info("Signing out of Tableau Server");
+        m_logger.debug("Signing out of Tableau Server");
 
         String url = Operation.SIGN_OUT.getUrl();
 
@@ -460,7 +460,7 @@ public class RestApiUtils {
                 ClientResponse.class);
 
         if (clientResponse.getStatus() == Status.NO_CONTENT.getStatusCode()) {
-            m_logger.info("Successfully signed out of Tableau Server");
+            m_logger.debug("Successfully signed out of Tableau Server");
         } else {
             m_logger.error("Failed to sign out of Tableau Server");
         }
@@ -604,7 +604,6 @@ public class RestApiUtils {
 
         MultivaluedMap<String,String> l = new MultivaluedMapImpl();
         if (filters != null) {
-            String tmp = filters.collectEncodedValue();
             l.add("filter", filters.collectEncodedValue());
         }
         if (params != null) {
@@ -613,13 +612,12 @@ public class RestApiUtils {
             }
         }
         // Sets the header and makes a GET request
-        WebResource webResource1 = webResource.queryParams(l);
         ClientResponse clientResponse = webResource.queryParams(l).header(TABLEAU_AUTH_HEADER, authToken).get(ClientResponse.class);
 
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.info("Response: \n" + responseXML);
+        m_logger.debug("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -660,7 +658,7 @@ public class RestApiUtils {
         ClientResponse clientResponse = webResource.queryParams(l).header(TABLEAU_AUTH_HEADER, authToken).get(ClientResponse.class);
         byte[] data = clientResponse.getEntity(byte[].class);
 
-        m_logger.info("Response received with data, size [" + data.length + "]");
+        m_logger.debug("Response received with data, size [" + data.length + "]");
 
         return data;
     }
@@ -687,7 +685,7 @@ public class RestApiUtils {
 private void invokeAppendFileUpload(TableauCredentialsType credential, String siteId, String uploadSessionId,
             byte[] chunk, int numChunkBytes) {
 
-        m_logger.info(String.format("Appending to file upload '%s'.", uploadSessionId));
+        m_logger.debug(String.format("Appending to file upload '%s'.", uploadSessionId));
 
         String url = Operation.APPEND_FILE_UPLOAD.getUrl(siteId, uploadSessionId);
 
@@ -718,7 +716,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
      */
     private FileUploadType invokeInitiateFileUpload(TableauCredentialsType credential, String siteId) {
 
-        m_logger.info(String.format("Initia projects on site '%s'.", siteId));
+        m_logger.debug(String.format("Initia projects on site '%s'.", siteId));
 
         String url = Operation.INITIATE_FILE_UPLOAD.getUrl(siteId);
 
@@ -727,7 +725,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
 
         // Verifies that the response has a file upload element
         if (response.getFileUpload() != null) {
-            m_logger.info("Initiate file upload is successful!");
+            m_logger.debug("Initiate file upload is successful!");
 
             return response.getFileUpload();
         }
@@ -785,7 +783,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
 
         // Verifies that the response has a workbook element
         if (response.getWorkbook() != null) {
-            m_logger.info("Publish workbook is successful!");
+            m_logger.debug("Publish workbook is successful!");
 
             return response.getWorkbook();
         }
@@ -824,7 +822,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
 
         // Verifies that the response has a workbook element
         if (response.getWorkbook() != null) {
-            m_logger.info("Publish workbook is successful!");
+            m_logger.debug("Publish workbook is successful!");
 
             return response.getWorkbook();
         }
