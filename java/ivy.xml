@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="org.tableau" module="tab-documentation-api"/>
+    <info organisation="org.tableau" module="tableau-java-api"/>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency org="com.google.guava" name="guava" rev="16.0.1"/>

@@ -37,8 +37,9 @@ import java.util.Map;
  */
 public class RestApiUtils {
 
-    public static final String API_VERSION = "3.3";
-    public static final String API_SCHEMA = "resources/ts-api_3_3.xsd";
+    public static final String API_VERSION = "3.5";
+    public static final String API_SCHEMA = "resources/ts-api_3_5.xsd";
+
     private static String server;
     private static int port;
     private static String project;
@@ -50,6 +51,7 @@ public class RestApiUtils {
         INITIATE_FILE_UPLOAD(getApiUriBuilder().path("sites/{siteId}/fileUploads")),
         QUERY_VIEW_IMAGE(getApiUriBuilder().path("sites/{siteId}/views/{viewId}/image")),
         QUERY_VIEW_PDF(getApiUriBuilder().path("sites/{siteId}/views/{viewId}/pdf")),
+        DOWNLOAD_WORKBOOK_PDF(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId/pdf")),
         PUBLISH_WORKBOOK(getApiUriBuilder().path("sites/{siteId}/workbooks")),
         QUERY_PROJECTS(getApiUriBuilder().path("sites/{siteId}/projects")),
         QUERY_SITES(getApiUriBuilder().path("sites")),
@@ -859,6 +861,14 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
         String url = Operation.QUERY_VIEW_IMAGE.getUrl(siteId, viewId);
 
         return get_data(url, credential.getToken(), params);
+    }
+
+    public byte[] invokeDownloadWorkbookPDF(TableauCredentialsType credential, String siteId,
+                        String workbookId, HashMap<String, String> params, String pagetype, String orientation) {
+
+        String url = Operation.DOWNLOAD_WORKBOOK_PDF.getUrl(siteId, workbookId);
+
+        return get_data(url, credential.getToken(), params, pagetype, orientation);
     }
 
     /**
