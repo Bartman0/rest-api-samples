@@ -51,7 +51,7 @@ public class RestApiUtils {
         INITIATE_FILE_UPLOAD(getApiUriBuilder().path("sites/{siteId}/fileUploads")),
         QUERY_VIEW_IMAGE(getApiUriBuilder().path("sites/{siteId}/views/{viewId}/image")),
         QUERY_VIEW_PDF(getApiUriBuilder().path("sites/{siteId}/views/{viewId}/pdf")),
-        DOWNLOAD_WORKBOOK_PDF(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId/pdf")),
+        DOWNLOAD_WORKBOOK_PDF(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId}/pdf")),
         PUBLISH_WORKBOOK(getApiUriBuilder().path("sites/{siteId}/workbooks")),
         QUERY_PROJECTS(getApiUriBuilder().path("sites/{siteId}/projects")),
         QUERY_SITES(getApiUriBuilder().path("sites")),
@@ -416,14 +416,14 @@ public class RestApiUtils {
      * @return the credential if authentication was successful, otherwise
      *         <code>null</code>
      */
-    public TableauCredentialsType invokeSignIn(String username, String password, String contentUrl) {
+    public TableauCredentialsType invokeSignIn(String username, String password, String siteName) {
 
         m_logger.debug("Signing in to Tableau Server");
 
         String url = Operation.SIGN_IN.getUrl();
 
         // Creates the payload required to authenticate to server
-        TsRequest payload = createPayloadForSignin(username, password, contentUrl);
+        TsRequest payload = createPayloadForSignin(username, password, siteName);
 
         // Makes a POST request with no credential
         TsResponse response = post(url, null, payload);
@@ -529,11 +529,11 @@ public class RestApiUtils {
      *            the username of the user to authenticate
      * @param password
      *            the password of the user to authenticate
-     * @param contentUrl
-     *            the content URL for the site to authenticate to
+     * @param siteName
+     *            the site name for the site to authenticate to
      * @return the request payload
      */
-    private TsRequest createPayloadForSignin(String username, String password, String contentUrl) {
+    private TsRequest createPayloadForSignin(String username, String password, String siteName) {
         // Creates the parent tsRequest element
         TsRequest requestPayload = m_objectFactory.createTsRequest();
 
@@ -542,7 +542,7 @@ public class RestApiUtils {
         SiteType site = m_objectFactory.createSiteType();
 
         // Sets the content URL of the site to sign in to
-        site.setContentUrl(contentUrl);
+        site.setContentUrl(siteName);
         signInCredentials.setSite(site);
 
         // Sets the name and password of the user to authenticate

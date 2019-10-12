@@ -646,6 +646,7 @@
         <xs:attribute name="sheetCount" type="xs:nonNegativeInteger" />
         <xs:attribute name="hasExtracts" type="xs:boolean" />
         <xs:attribute name="encryptExtracts" type="xs:string" />
+        <xs:attribute name="defaultViewId" type="resourceIdType" />
     </xs:complexType>
 
     <xs:complexType name="degradationListType">
