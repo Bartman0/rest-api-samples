@@ -37,8 +37,8 @@ import java.util.Map;
  */
 public class RestApiUtils {
 
-    public static final String API_VERSION = "3.5";
-    public static final String API_SCHEMA = "resources/ts-api_3_5.xsd";
+    public static String API_VERSION = "3.5";
+    public static String API_SCHEMA = "resources/ts-api_3_5.xsd";
 
     private static String server;
     private static int port;
@@ -86,9 +86,9 @@ public class RestApiUtils {
      *
      * @return the single instance of the RestApiUtils
      */
-    public static RestApiUtils getInstance(String server, int port, String project) {
+    public static RestApiUtils getInstance(String server, int port, String project, String schema) {
         if (INSTANCE == null) {
-            INSTANCE = new RestApiUtils(server, port, project);
+            INSTANCE = new RestApiUtils(server, port, project, schema);
             initialize();
         }
 
@@ -131,10 +131,11 @@ public class RestApiUtils {
     private ObjectFactory m_objectFactory = new ObjectFactory();
 
     // This class is implemented as a singleton, so it cannot be constructed externally
-    private RestApiUtils(String server, int port, String project) {
+    private RestApiUtils(String server, int port, String project, String schema) {
         RestApiUtils.server = server;
         RestApiUtils.port = port;
         RestApiUtils.project = project;
+        RestApiUtils.API_SCHEMA = schema;
     }
 
     /**

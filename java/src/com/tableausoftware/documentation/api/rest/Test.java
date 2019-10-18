@@ -36,8 +36,10 @@ public class Test {
         String username = s_properties.getProperty("user.admin.name");
         String password = s_properties.getProperty("user.admin.password");
         String contentUrl = s_properties.getProperty("site.default.contentUrl");
+        String projectName = s_properties.getProperty("site.project");
+        String schema = s_properties.getProperty("server.schema.location");
 
-        s_restApiUtils = RestApiUtils.getInstance(s_properties.getProperty("server.host"), 443, "project");
+        s_restApiUtils = RestApiUtils.getInstance(s_properties.getProperty("server.host"), 443, "default", schema);
 
         // Signs in to server and saves the authentication token, site ID, and current user ID
         TableauCredentialsType credential = s_restApiUtils.invokeSignIn(username, password, contentUrl);
@@ -52,7 +54,7 @@ public class Test {
         ProjectType defaultProject = null;
         ProjectListType projects = s_restApiUtils.invokeQueryProjects(credential, currentSiteId);
         for (ProjectType project : projects.getProject()) {
-            if (project.getName().equals("default") || project.getName().equals("Default")) {
+            if (project.getName().equalsIgnoreCase(projectName)) {
                 defaultProject = project;
 
                 s_logger.info(String.format("Default project found: %s", defaultProject.getId()));
@@ -73,55 +75,9 @@ public class Test {
             return;
         }
 
-        // Sets the name to assign to the workbook to be published
-        String workbookName = s_properties.getProperty("workbook.sample.name");
-
-        // Gets the workbook file to publish
-        String workbookPath = s_properties.getProperty("workbook.sample.path");
-        File workbookFile = new File(workbookPath);
-
-        // Gets whether or not to publish the workbook using file uploads
-        boolean chunkedPublish = Boolean.valueOf(s_properties.getProperty("workbook.publish.chunked"));
-
-        // Publishes the workbook as a multipart request
-        WorkbookType publishedWorkbook = s_restApiUtils.invokePublishWorkbook(credential, currentSiteId,
-                defaultProject.getId(), workbookName, workbookFile, chunkedPublish);
-
-        // Creates a non Active Directory group named "TableauExample"
-        GroupType group = s_restApiUtils.invokeCreateGroup(credential, currentSiteId, "TableauExample");
-
-        // Sets permission to allow the group to read the new workbook, but not
-        // to modify its permissions
-        Map<String, String> capabilities = new HashMap<String, String>();
-        capabilities.put("Read", "Allow");
-        capabilities.put("ChangePermissions", "Deny");
-
-        // Creates the grantee capability element for the group
-        GranteeCapabilitiesType groupCapabilities = s_restApiUtils.createGroupGranteeCapability(group, capabilities);
-
-        // Adds the created group to the list of grantees
-        List<GranteeCapabilitiesType> granteeCapabilities = new ArrayList<GranteeCapabilitiesType>();
-        granteeCapabilities.add(groupCapabilities);
-
-        // Makes the call to add the permissions
-        s_restApiUtils.invokeAddPermissionsToWorkbook(credential, currentSiteId, publishedWorkbook.getId(),
-                granteeCapabilities);
-
-        // Gets the list of workbooks the current user can read
-        List<WorkbookType> currentUserWorkbooks = s_restApiUtils.invokeQueryWorkbooksForUser(credential, currentSiteId,
-                currentUserId, null, null).getWorkbook();
-
-        // Checks whether the workbook published previously is in the list, then
-        // checks whether the workbook's owner is the current user
-        for (WorkbookType workbook : currentUserWorkbooks) {
-            if (workbook.getId().equals(publishedWorkbook.getId())) {
-                s_logger.debug(String.format("Published workbook found: %s", workbook.getId()));
-
-                if (workbook.getOwner().getId().equals(currentUserId)) {
-                    s_logger.debug("Published workbook was published by current user");
-                }
-            }
-        }
+        // Gets the list of workbooks
+        List<WorkbookType> currentUserWorkbooks = s_restApiUtils.invokeQueryWorkbooksForSite(credential, currentSiteId,
+                null, null).getWorkbook();
 
         // Signs out of the server. This invalidates the authentication token so
         // that it cannot be used for more requests.
