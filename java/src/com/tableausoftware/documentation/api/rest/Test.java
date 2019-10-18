@@ -79,6 +79,8 @@ public class Test {
         List<WorkbookType> currentUserWorkbooks = s_restApiUtils.invokeQueryWorkbooksForSite(credential, currentSiteId,
                 null, null).getWorkbook();
 
+        s_logger.info("SUCCESS");
+
         // Signs out of the server. This invalidates the authentication token so
         // that it cannot be used for more requests.
         s_restApiUtils.invokeSignOut(credential);
