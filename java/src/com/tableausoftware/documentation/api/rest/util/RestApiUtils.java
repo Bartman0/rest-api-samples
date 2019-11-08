@@ -58,6 +58,7 @@ public class RestApiUtils {
         QUERY_WORKBOOKS_FOR_USER(getApiUriBuilder().path("sites/{siteId}/users/{userId}/workbooks")),
         QUERY_WORKBOOKS(getApiUriBuilder().path("sites/{siteId}/workbooks")),
         QUERY_VIEWS_FOR_WORKBOOK(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId}/views")),
+        UPDATE_WORKBOOK_NOW(getApiUriBuilder().path("sites/{siteId}/workbooks/{workbookId}/refresh")),
         SIGN_IN(getApiUriBuilder().path("auth/signin")),
         SIGN_OUT(getApiUriBuilder().path("auth/signout"));
 
@@ -86,6 +87,10 @@ public class RestApiUtils {
      *
      * @return the single instance of the RestApiUtils
      */
+    public static RestApiUtils getInstance(String server, int port, String project) {
+        return getInstance(server, port, project, API_SCHEMA);
+    }
+
     public static RestApiUtils getInstance(String server, int port, String project, String schema) {
         if (INSTANCE == null) {
             INSTANCE = new RestApiUtils(server, port, project, schema);
@@ -391,7 +396,7 @@ public class RestApiUtils {
     }
 
     public ViewListType invokeQueryViewsForWorkbook(TableauCredentialsType credential, String siteId, String workbookId,
-                    FilterCollection filters, HashMap<String, String> params) {
+                                                    FilterCollection filters, HashMap<String, String> params) {
 
         m_logger.debug(String.format("Querying views for workbook on site '%s'.", siteId));
 
@@ -409,6 +414,35 @@ public class RestApiUtils {
 
         // No views were found
         return null;
+    }
+
+    public JobType updateWorkbookNow(TableauCredentialsType credential, String siteId, String workbookId) {
+
+        m_logger.debug(String.format("Update workbook %s on site '%s'.", workbookId, siteId));
+
+        String url = Operation.UPDATE_WORKBOOK_NOW.getUrl(siteId, workbookId);
+
+        TsRequest payload = createPayloadForUpdateWorkbookNow();
+
+        // Makes a POST request with an empty request
+        TsResponse response = post(url, credential.getToken(), payload);
+
+        // Verifies that the response has a job element
+        if (response.getJob() != null) {
+            m_logger.debug("Update workbook now is successful!");
+
+            return response.getJob();
+        }
+
+        // No views were found
+        return null;
+    }
+
+    private TsRequest createPayloadForUpdateWorkbookNow() {
+        // Creates the parent tsRequest element
+        TsRequest requestPayload = m_objectFactory.createTsRequest();
+
+        return requestPayload;
     }
 
     /**

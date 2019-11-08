@@ -54,3 +54,8 @@ When `ant` is run in a command prompt, it may respond with "ant is not recognize
 
 Make sure that the `ANT_HOME` and `JAVA_HOME` variables are set as described in the installation guide for Apache Ant. Paths should not include quotes.
 For more information, see <http://ant.apache.org/manual/install.html#windows>
+
+## Generate XML classes
+```
+xjc -p com.tableausoftware.documentation.api.rest.bindings resources/ts-api_3_5.xsd -d work
+```
