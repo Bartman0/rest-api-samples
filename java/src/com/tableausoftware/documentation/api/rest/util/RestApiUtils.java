@@ -441,7 +441,6 @@ public class RestApiUtils {
     private TsRequest createPayloadForUpdateWorkbookNow() {
         // Creates the parent tsRequest element
         TsRequest requestPayload = m_objectFactory.createTsRequest();
-
         return requestPayload;
     }
 
@@ -954,7 +953,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                m_logger.error("There was a problem marshalling the payload: " + ex.toString());
             }
         }
 
@@ -1003,7 +1002,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                m_logger.error("There was a problem marshalling the payload: " + ex.toString());
             }
         }
 
@@ -1063,7 +1062,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                m_logger.error("There was a problem marshalling the payload: " + ex.toString());
             }
         }
 
@@ -1113,7 +1112,7 @@ private void invokeAppendFileUpload(TableauCredentialsType credential, String si
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                m_logger.error("There was a problem marshalling the payload: " + ex.toString());
             }
         }
 

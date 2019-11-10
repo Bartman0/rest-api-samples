@@ -10,7 +10,7 @@
 
     <xs:element name="tsRequest">
         <xs:complexType>
-            <xs:choice>
+            <xs:choice minOccurs="0">
                 <xs:element name="column" type="columnType" />
                 <xs:element name="connection" type="connectionType" />
                 <xs:element name="connections" type="connectionListType" />
@@ -39,7 +39,7 @@
                 <xs:element name="subscription" type="subscriptionType" />
                 <xs:element name="task" type="taskType" />
             </xs:choice>
-        </xs:complexType>
+       </xs:complexType>
     </xs:element>
 
     <xs:element name="tsResponse">
