@@ -37,8 +37,8 @@ import java.util.Map;
  */
 public class RestApiUtils {
 
-    public static String API_VERSION = "3.5";
-    public static String API_SCHEMA = "resources/ts-api_3_5.xsd";
+    public static String API_VERSION = "3.7";
+    public static String API_SCHEMA = "resources/ts-api_3_7.xsd";
 
     private static String server;
     private static int port;
@@ -107,11 +107,7 @@ public class RestApiUtils {
      * @return the URI builder
      */
     private static UriBuilder getApiUriBuilder() {
-<<<<<<< HEAD
         return UriBuilder.fromPath(server + "/api/" + API_VERSION + "/");
-=======
-        return UriBuilder.fromPath(m_properties.getProperty("server.host") + "/api/3.7");
->>>>>>> e19c411ac396c05fc0af612a3d498357ea222592
     }
     /**
      * Initializes the RestApiUtils. The initialize code loads values from the configuration
