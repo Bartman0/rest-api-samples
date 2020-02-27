@@ -1,8 +1,12 @@
 .idea/
 
 build/
-
 out/
-
 lib/
 
+# java dirs
+**/build
+**/lib
+
+# python files
+*.pyc
