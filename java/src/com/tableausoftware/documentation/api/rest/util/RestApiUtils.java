@@ -37,8 +37,8 @@ import java.util.Map;
  */
 public class RestApiUtils {
 
-    public static String API_VERSION = "3.7";
-    public static String API_SCHEMA = "resources/ts-api_3_7.xsd";
+    public static String API_VERSION = "3.5";
+    public static String API_SCHEMA = "resources/ts-api_3_5.xsd";
 
     private static String server;
     private static int port;

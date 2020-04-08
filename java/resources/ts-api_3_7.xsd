@@ -6,31 +6,39 @@
         Definition of request and response elements that wrap all payloads.
         Definition of the error message payload.
     -->
+    <!-- released with Tableau Server 2020.1 -->
 
     <xs:element name="tsRequest">
         <xs:complexType>
-            <xs:choice>
+            <xs:choice minOccurs="0">
+                <xs:element name="column" type="columnType" />
                 <xs:element name="connection" type="connectionType" />
                 <xs:element name="connections" type="connectionListType" />
                 <xs:element name="credentials" type="tableauCredentialsType" />
                 <xs:element name="dataAlert" type="dataAlertType" />
+                <xs:element name="dataQualityWarning" type="dataQualityWarningType" />
+                <xs:element name="dataRole" type="dataRoleType" />
+                <xs:element name="database" type="databaseType" />
                 <xs:element name="datasource" type="dataSourceType" />
+                <xs:element name="distinctValues" type="distinctValueListType" />
                 <xs:element name="favorite" type="favoriteType" />
+                <xs:element name="field" type="fieldType"/>
+                <xs:element name="fieldConcept" type="fieldConceptType" />
                 <xs:element name="flow" type="flowType" />
+                <xs:element name="flowWarnings" type="flowWarningsListContainerType" />
                 <xs:element name="group" type="groupType" />
                 <xs:element name="metric" type="metricType" />
                 <xs:element name="permissions" type="permissionsType" />
                 <xs:element name="project" type="projectType" />
                 <xs:element name="schedule" type="scheduleType" />
                 <xs:element name="site" type="siteType" />
+                <xs:element name="table" type="tableType" />
                 <xs:element name="tags" type="tagListType" />
                 <xs:element name="user" type="userType" />
+                <xs:element name="webhook" type="webhookType" />
                 <xs:element name="workbook" type="workbookType" />
                 <xs:element name="subscription" type="subscriptionType" />
                 <xs:element name="task" type="taskType" />
-                <xs:element name="field" type="fieldType"/>
-                <xs:element name="distinctValues" type="distinctValueListType" />
-                <xs:element name="fieldConcept" type="fieldConceptType" />
             </xs:choice>
         </xs:complexType>
     </xs:element>
@@ -41,11 +49,16 @@
                 <xs:group ref="paginatedResponseGroup" />
                 <xs:element name="backgroundJob" type="backgroundJobType" />
                 <xs:element name="backgroundJobs" type="backgroundJobListType" />
+                <xs:element name="column" type="columnType" />
                 <xs:element name="connection" type="connectionType" />
                 <xs:element name="connections" type="connectionListType" />
                 <xs:element name="credentials" type="tableauCredentialsType" />
                 <xs:element name="dataAlert" type="dataAlertType" />
                 <xs:element name="dataAlerts" type="dataAlertListType" />
+                <xs:element name="dataQualityWarning" type="dataQualityWarningType" />
+                <xs:element name="dataQualityWarningList" type="dataQualityWarningListType" />
+                <xs:element name="dataRole" type="dataRoleType" />
+                <xs:element name="database" type="databaseType" />
                 <xs:element name="datasource" type="dataSourceType" />
                 <xs:element name="error" type="errorType" />
                 <xs:element name="favorites" type="favoriteListType" />
@@ -62,10 +75,14 @@
                 <xs:element name="serverInfo" type="serverInfo" />
                 <xs:element name="serverSettings" type="serverSettings" />
                 <xs:element name="site" type="siteType" />
+                <xs:element name="table" type="tableType" />
                 <xs:element name="tags" type="tagListType" />
                 <xs:element name="user" type="userType" />
                 <xs:element name="view" type="viewType" />
                 <xs:element name="views" type="viewListType" />
+                <xs:element name="webhook" type="webhookType" />
+                <xs:element name="webhooks" type="webhookListType" />
+                <xs:element name="webhookTestResult" type="webhookTestResultType" />
                 <xs:element name="workbook" type="workbookType" />
                 <xs:element name="subscription" type="subscriptionType" />
                 <xs:element name="task" type="taskType" />
@@ -78,6 +95,7 @@
                 <xs:element name="valueConceptCount" type="valueConceptCountType" />
                 <xs:element name="listValueConcepts" type="listValueConceptsType" />
                 <xs:element name="fieldConcept" type="fieldConceptType" />
+                <xs:element name="getIndexingStatus" type="indexingStatusType" />
             </xs:choice>
         </xs:complexType>
     </xs:element>
@@ -86,6 +104,8 @@
         <xs:sequence>
             <xs:element name="pagination" type="paginationType" />
             <xs:choice>
+                <xs:element name="columns" type="columnListType" />
+                <xs:element name="databases" type="databaseListType" />
                 <xs:element name="datasources" type="dataSourceListType" />
                 <xs:element name="extracts" type="extractListType" />
                 <xs:element name="flows" type="flowListType" />
@@ -96,6 +116,7 @@
                 <xs:element name="revisions" type="revisionListType" />
                 <xs:element name="schedules" type="scheduleListType" />
                 <xs:element name="sites" type="siteListType" />
+                <xs:element name="tables" type="tableListType" />
                 <xs:element name="users" type="userListType" />
                 <xs:element name="workbooks" type="workbookListType" />
                 <xs:element name="subscriptions" type="subscriptionListType"/>
@@ -171,6 +192,7 @@
         <xs:attribute name="filename" type="xs:string" />
         <xs:attribute name="googleSheetId" type="xs:string" />
         <!-- End of attributes for OAuth connections -->
+        <xs:attribute name="embedPassword" type="xs:boolean" />
         <xs:attribute name="serverAddress" type="xs:string" />
         <xs:attribute name="serverPort" type="xs:nonNegativeInteger" />
         <xs:attribute name="userName" type="xs:string" />
@@ -254,6 +276,7 @@
         <xs:attribute name="connectedWorkbooksCount" type="xs:nonNegativeInteger" />
         <xs:attribute name="favoritesTotal" type="xs:nonNegativeInteger" />
         <xs:attribute name="encryptExtracts" type="xs:string" />
+        <xs:attribute name="useRemoteQueryAgent" type="xs:boolean" />
     </xs:complexType>
 
     <xs:complexType name="revisionListType">
@@ -399,6 +422,7 @@
                 <xs:element name="project" type="projectType" />
                 <xs:element name="view" type="viewType" />
                 <xs:element name="workbook" type="workbookType" />
+                <xs:element name="metric" type="metricType" />
             </xs:choice>
             <xs:element name="granteeCapabilities" type="granteeCapabilitiesType" minOccurs="0" maxOccurs="unbounded" />
         </xs:sequence>
@@ -516,12 +540,21 @@
         <xs:attribute name="revisionHistoryEnabled" type="xs:boolean" />
         <xs:attribute name="revisionLimit" type="revisionLimitType" />
         <xs:attribute name="subscribeOthersEnabled" type="xs:boolean" />
+        <xs:attribute name="allowSubscriptionAttachments" type="xs:boolean" />
         <xs:attribute name="guestAccessEnabled" type="xs:boolean" />
         <xs:attribute name="cacheWarmupEnabled" type="xs:boolean" />
         <xs:attribute name="commentingEnabled" type="xs:boolean" />
         <xs:attribute name="cacheeWarmupThreshold" type="xs:nonNegativeInteger" />
         <xs:attribute name="flowsEnabled" type="xs:boolean" />
         <xs:attribute name="extractEncryptionMode" type="xs:string" />
+        <xs:attribute name="materializedViewsMode" type="xs:string" />
+        <xs:attribute name="mobileBiometricsEnabled" type="xs:boolean" />
+        <xs:attribute name="sheetImageEnabled" type="xs:boolean" />
+        <xs:attribute name="catalogingEnabled" type="xs:boolean" />
+        <xs:attribute name="derivedPermissionsEnabled" type="xs:boolean" />
+        <xs:attribute name="userVisibilityMode" type="xs:string"/>
+        <xs:attribute name="requestAccessEnabled" type="xs:boolean" />
+
     </xs:complexType>
 
     <!-- Credentials for accessing Tableau Server -->
@@ -576,6 +609,7 @@
         <xs:sequence>
             <xs:element name="workbook" type="workbookType" minOccurs="0" maxOccurs="1" />
             <xs:element name="owner" type="userType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="project" type="projectType" minOccurs="0" maxOccurs="1" />
             <xs:element name="tags" type="tagListType" minOccurs="0" />
             <xs:element name="usage" minOccurs="0">
                 <xs:complexType>
@@ -585,12 +619,14 @@
         </xs:sequence>
         <xs:attribute name="id" type="resourceIdType" />
         <xs:attribute name="name" type="xs:string" />
-        <xs:attribute name="contentUrl" type="xs:string" />
+        <xs:attribute name="contentUrl" type="xs:string" /> <!-- deprecate this field -->
         <xs:attribute name="createdAt" type="xs:dateTime" />
         <xs:attribute name="updatedAt" type="xs:dateTime" />
         <xs:attribute name="sheetType" type="xs:string" />
         <xs:attribute name="favoritesTotal" type="xs:nonNegativeInteger" />
         <xs:attribute name="hidden" type="xs:boolean" />
+        <xs:attribute name="recentlyViewed" type="xs:boolean" />
+        <xs:attribute name="viewUrlName" type="xs:string" />
     </xs:complexType>
 
     <xs:complexType name="workbookListType">
@@ -608,6 +644,7 @@
             <xs:element name="owner" type="userType" minOccurs="0" />
             <xs:element name="tags" type="tagListType" minOccurs="0" />
             <xs:element name="views" type="viewListType" minOccurs="0" />
+            <xs:element name="materializedViewsEnablementConfig" type="materializedViewsEnablementConfigType" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="id" type="resourceIdType" />
         <xs:attribute name="name" type="xs:string" />
@@ -622,6 +659,111 @@
         <xs:attribute name="sheetCount" type="xs:nonNegativeInteger" />
         <xs:attribute name="hasExtracts" type="xs:boolean" />
         <xs:attribute name="encryptExtracts" type="xs:string" />
+        <xs:attribute name="recentlyViewed" type="xs:boolean" />
+        <xs:attribute name="defaultViewId" type="resourceIdType" />
+    </xs:complexType>
+
+    <!-- webhooks:
+    Definition of types for the primary entities that are included in the payloads of requests and responses.
+    -->
+
+    <xs:complexType name="webhookListType">
+        <xs:sequence>
+            <xs:element name="webhook" type="webhookType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="webhookType">
+        <xs:sequence>
+            <xs:element name="webhook-source" type="webhookSourceType" />
+            <xs:element name="webhook-destination" type="webhookDestinationType" />
+            <xs:element name="owner" type="userType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="enabled" type="xs:boolean" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime" />
+    </xs:complexType>
+
+    <xs:complexType name="webhookDestinationType">
+        <!-- we might later include information about retry logic here or other common items -->
+        <xs:choice>
+            <xs:element name="webhook-destination-http" type="webhookDestinationHttpType" />
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="webhookDestinationHttpType">
+        <xs:attribute name="method">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="POST" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="url">
+            <xs:simpleType>
+                <xs:restriction base="xs:anyURI">
+                    <xs:pattern value="https?://.+" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="webhookSourceType">
+        <!-- We may later include some general filtering logic but for now we leave out -->
+        <!-- We are also making this a choice instead of a simple enumeration type in case we have anything
+             specific to various events later. We also hate attributes called "type" -->
+        <xs:choice>
+            <xs:element name="webhook-source-event-datasource-refresh-started"
+                        type="webhookSourceEventDatasourceRefreshStartedType" />
+            <xs:element name="webhook-source-event-datasource-refresh-succeeded"
+                        type="webhookSourceEventDatasourceRefreshSucceededType" />
+            <xs:element name="webhook-source-event-datasource-refresh-failed"
+                        type="webhookSourceEventDatasourceRefreshFailedType" />
+            <xs:element name="webhook-source-event-datasource-updated"
+                        type="webhookSourceEventDatasourceUpdatedType" />
+            <xs:element name="webhook-source-event-datasource-created"
+                        type="webhookSourceEventDatasourceCreatedType" />
+            <xs:element name="webhook-source-event-datasource-deleted"
+                        type="webhookSourceEventDatasourceDeletedType" />
+            <xs:element name="webhook-source-event-workbook-updated"
+                        type="webhookSourceEventWorkbookUpdatedType" />
+            <xs:element name="webhook-source-event-workbook-created"
+                        type="webhookSourceEventWorkbookCreatedType" />
+            <xs:element name="webhook-source-event-workbook-deleted"
+                        type="webhookSourceEventWorkbookDeletedType" />
+            <xs:element name="webhook-source-event-view-deleted"
+                        type="webhookSourceEventViewDeletedType" />
+            <xs:element name="webhook-source-event-workbook-refresh-started"
+                        type="webhookSourceEventWorkbookRefreshStartedType" />
+            <xs:element name="webhook-source-event-workbook-refresh-succeeded"
+                        type="webhookSourceEventWorkbookRefreshSucceededType" />
+            <xs:element name="webhook-source-event-workbook-refresh-failed"
+                        type="webhookSourceEventWorkbookRefreshFailedType" />
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="webhookSourceEventDatasourceCreatedType" />
+    <xs:complexType name="webhookSourceEventDatasourceDeletedType" />
+    <xs:complexType name="webhookSourceEventDatasourceRefreshFailedType" />
+    <xs:complexType name="webhookSourceEventDatasourceRefreshStartedType" />
+    <xs:complexType name="webhookSourceEventDatasourceRefreshSucceededType" />
+    <xs:complexType name="webhookSourceEventDatasourceUpdatedType" />
+    <xs:complexType name="webhookSourceEventWorkbookCreatedType" />
+    <xs:complexType name="webhookSourceEventWorkbookDeletedType" />
+    <xs:complexType name="webhookSourceEventWorkbookUpdatedType" />
+    <xs:complexType name="webhookSourceEventViewDeletedType" />
+    <xs:complexType name="webhookSourceEventWorkbookRefreshStartedType" />
+    <xs:complexType name="webhookSourceEventWorkbookRefreshSucceededType" />
+    <xs:complexType name="webhookSourceEventWorkbookRefreshFailedType" />
+
+    <xs:complexType name="webhookTestResultType">
+        <xs:sequence>
+            <xs:element name="body" type="xs:string" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="status" type="xs:int" />
     </xs:complexType>
 
     <xs:complexType name="degradationListType">
@@ -668,6 +810,13 @@
         <xs:attribute name="name" type="xs:string" />
     </xs:complexType>
 
+    <xs:complexType name="flowWarningsListContainerType">
+        <xs:choice>
+            <xs:element name="connectionWarnings" type="warningListType" minOccurs="0"></xs:element>
+            <xs:element name="nodeWarnings" type="warningListType" minOccurs="0"></xs:element>
+        </xs:choice>
+    </xs:complexType>
+
     <xs:complexType name="metricListType">
         <xs:sequence>
             <xs:element name="metric" type="metricType" minOccurs="0" maxOccurs="unbounded" />
@@ -687,6 +836,8 @@
         <xs:attribute name="createdAt" type="xs:dateTime" />
         <xs:attribute name="updatedAt" type="xs:dateTime" />
         <xs:attribute name="definition" type="xs:string" />
+        <xs:attribute name="datasourceRepoUrl" type="xs:string" />
+        <xs:attribute name="suspended" type="xs:boolean" />
     </xs:complexType>
 
 
@@ -720,10 +871,10 @@
 
     <xs:complexType name="nameType">
         <xs:sequence>
-            <xs:element name="locale" type="xs:string" />
-            <xs:element name="name" type="xs:string" />
-            <xs:element name="weight" type="xs:double" />
-            <xs:element name="isPrimary" type="xs:boolean" />
+            <xs:element name="locale" type="xs:string" minOccurs="0" />
+            <xs:element name="name" type="xs:string" minOccurs="0" />
+            <xs:element name="weight" type="xs:double" minOccurs="0" />
+            <xs:element name="isPrimary" type="xs:boolean" minOccurs="0" />
         </xs:sequence>
     </xs:complexType>
 
@@ -857,6 +1008,7 @@
             <xs:element name="nameCharacteristics" type="nameCharacteristicsType" minOccurs="0" />
             <xs:element name="description" type="xs:string" minOccurs="0" />
             <xs:element name="parentValueConceptURI" type="xs:string" minOccurs="0" />
+            <xs:element name="value" type="semanticsValueType" minOccurs="0" />
         </xs:sequence>
     </xs:complexType>
 
@@ -870,6 +1022,45 @@
         <xs:sequence>
             <xs:element name="valueConcepts" type="valueConceptType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="nextPageToken" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- DataQualityService Types -->
+    <xs:complexType name="dataQualityWarningType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="0" />
+            <xs:element name="owner" type="userType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="userDisplayName" type="xs:string" />
+        <xs:attribute name="contentId" type="resourceIdType" />
+        <xs:attribute name="contentType" type="xs:string" />
+        <xs:attribute name="message" type="xs:string" />
+        <xs:attribute name="type" type="xs:string" />
+        <xs:attribute name="isActive" type="xs:boolean" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime" />
+    </xs:complexType>
+
+    <xs:complexType name="dataQualityWarningListType">
+        <xs:sequence>
+            <xs:element name="dataQualityWarning" type="dataQualityWarningType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- DataRoleService Types -->
+    <!-- DataRoleService REST API is NOT a public API. It's for Tableau Prep only. -->
+    <xs:complexType name="dataRoleType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="0" />
+            <xs:element name="project" type="projectType" minOccurs="0" />
+            <xs:element name="owner" type="userType" minOccurs="0" />
+            <xs:element name="name" type="xs:string" />
+            <xs:element name="description" type="xs:string" minOccurs="0" />
+            <xs:element name="createdAt" type="xs:dateTime" minOccurs="0" />
+            <xs:element name="updatedAt" type="xs:dateTime" minOccurs="0" />
+            <xs:element name="fieldConcept" type='fieldConceptType' />
+            <xs:element name="url" type='xs:string' />
         </xs:sequence>
     </xs:complexType>
 
@@ -1146,6 +1337,8 @@
         </xs:sequence>
         <xs:attribute name="id" type="resourceIdType" />
         <xs:attribute name="subject" type="xs:string" use="required"/>
+        <xs:attribute name="attachImage" type="xs:boolean" />
+        <xs:attribute name="attachPdf" type="xs:boolean" />
     </xs:complexType>
 
     <xs:complexType name="subscriptionContentType">
@@ -1212,8 +1405,14 @@
         <xs:choice>
             <xs:element name="extractRefresh" type="taskExtractRefreshType" />
             <xs:element name="flowRun" type="taskRunFlowType" />
+            <xs:element name="schedule" type="scheduleType" minOccurs="0" maxOccurs="1" />
         </xs:choice>
         <xs:attribute name="runNow" type="xs:boolean" />
+        <xs:attribute name="state" type="xs:string" />
+        <xs:attribute name="id" type="xs:string"/>
+        <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
+        <xs:attribute name="consecutiveFailedCount" type="xs:nonNegativeInteger"/>
+        <xs:attribute name="type" type="xs:string" />
     </xs:complexType>
 
     <xs:complexType name="taskRunFlowType">
@@ -1251,6 +1450,108 @@
 
     <xs:complexType name="warningType">
         <xs:attribute name="message" type="xs:string" />
+        <xs:attribute name="id" type="xs:string"  use="optional" />
+        <xs:attribute name="errorCode" type="xs:string"  use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="indexingStatusType">
+        <xs:sequence>
+            <xs:element name="indexingStatusCode" type="xs:string" />
+            <xs:element name="indexingErrorCode" type="xs:string" />
+            <xs:element name="indexedValueConceptVersion" type="xs:long" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="databaseType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="0" />
+            <xs:element name="contact" type="userType"/>
+            <xs:element name="certifier" type="userType" />
+        </xs:sequence>
+
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="connectionType" type="xs:string" />
+        <xs:attribute name="isEmbedded" type="xs:boolean" />
+        <xs:attribute name="description" type="xs:string" />
+        <xs:attribute name="isCertified" type="xs:boolean" />
+        <xs:attribute name="certificationNote" type="xs:string" />
+        <xs:attribute name="type" type="databaseTypeType" />
+        <xs:attribute name="hostName" type="xs:string" />
+        <xs:attribute name="port" type="xs:integer" />
+        <xs:attribute name="filePath" type="xs:string" />
+        <xs:attribute name="provider" type="xs:string" />
+        <xs:attribute name="mimeType" type="xs:string" />
+        <xs:attribute name="fileId" type="xs:string" />
+        <xs:attribute name="connectorUrl" type="xs:string" />
+        <xs:attribute name="requestUrl" type="xs:string" />
+        <xs:attribute name="fileExtension" type="xs:string" />
+        <xs:attribute name="contentPermissions">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="LockedToDatabase" />
+                    <xs:enumeration value="ManagedByOwner" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name ="databaseTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DatabaseServer" />
+            <xs:enumeration value="File" />
+            <xs:enumeration value="WebDataConnector" />
+            <xs:enumeration value="CloudFile" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name ="tableType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="0" />
+            <xs:element name="contact" type="userType" />
+            <xs:element name="certifier" type="userType" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="description" type="xs:string" />
+        <xs:attribute name="isEmbedded" type="xs:boolean" />
+        <xs:attribute name="isCertified" type="xs:boolean" />
+        <xs:attribute name="certificationNote" type="xs:string" />
+        <xs:attribute name="schema" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="databaseListType">
+        <xs:sequence>
+            <xs:element name="database" type="databaseType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="tableListType">
+        <xs:sequence>
+            <xs:element name="table" type="tableType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="columnListType">
+        <xs:sequence>
+            <xs:element name="column" type="columnType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="columnType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="description" type="xs:string" />
+        <xs:attribute name="remoteType" type="xs:string" />
+        <xs:attribute name="parentTableId" type="resourceIdType" />
+    </xs:complexType>
+
+    <xs:complexType name="materializedViewsEnablementConfigType">
+        <xs:attribute name="materializedViewsEnabled" type="xs:boolean" />
+        <xs:attribute name="materializeNow" type="xs:boolean" default="false" />
     </xs:complexType>
 
 </xs:schema>
